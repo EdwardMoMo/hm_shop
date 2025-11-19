@@ -16,6 +16,8 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
 
+  List<CategoryItem> _categoryList = [];
+
   List<BannerItem> _bannerList=[
     /* BannerItem(
       id: "1",
@@ -35,7 +37,7 @@ class _HomeViewState extends State<HomeView> {
     return [
       SliverToBoxAdapter(child: HmSlider(bannerList: _bannerList)),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
-      SliverToBoxAdapter(child: HmCategory()),
+      SliverToBoxAdapter(child: HmCategory( categoryList: _categoryList)),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
       SliverToBoxAdapter(child: HmSuggestion()),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
@@ -61,10 +63,16 @@ class _HomeViewState extends State<HomeView> {
   void initState(){
     super.initState();
     _getBannerList();
+    _getCategoryList();
   }
 
   void _getBannerList() async {
     _bannerList = await getBannerListAPI();
+    setState(() {});
+  }
+
+  void _getCategoryList() async {
+    _categoryList = await getCategoryListAPI();
     setState(() {});
   }
 
