@@ -56,7 +56,7 @@ class _HomeViewState extends State<HomeView> {
         ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 10)),
-        HmMoreList(),
+        HmMoreList(recommendList: _recommendList),
 
     ];
   }
@@ -72,6 +72,13 @@ class _HomeViewState extends State<HomeView> {
     title: "",
     subTypes: [],
   );
+
+  List<GoodDetailItem> _recommendList=[];
+
+  void _getRecommendList() async {
+    _recommendList = await getRecommendListAPI({"limit":10});
+    setState(() {});
+  }
 
   void _getInVogueList() async {
     _inVogueResult = await getInVogueListAPI();
@@ -92,6 +99,7 @@ class _HomeViewState extends State<HomeView> {
     _getProductList();
     _getInVogueList();
     _getOneStopList();
+    _getRecommendList();
   }
 
   void _getProductList() async {
