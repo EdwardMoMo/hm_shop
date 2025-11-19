@@ -99,3 +99,108 @@ class CategoryItem {
     );
   }
 }
+
+// 商品项
+class GoodsItem {
+  String id;
+  String name;
+  String? desc;
+  String price;
+  String picture;
+  int orderNum;
+
+  GoodsItem({
+    required this.id,
+    required this.name,
+    this.desc,
+    required this.price,
+    required this.picture,
+    required this.orderNum,
+  });
+
+  factory GoodsItem.fromJSON(Map<String, dynamic> json) {
+    return GoodsItem(
+      id: json["id"],
+      name: json["name"],
+      desc: json["desc"],
+      price: json["price"],
+      picture: json["picture"] ?? "",
+      orderNum: json["orderNum"] ?? 0,
+    );
+  }
+}
+
+// 商品列表信息
+class GoodsItems {
+  int counts;
+  int pageSize;
+  int pages;
+  int page;
+  List<GoodsItem> items;
+
+  GoodsItems({
+    required this.counts,
+    required this.pageSize,
+    required this.pages,
+    required this.page,
+    required this.items,
+  });
+
+  factory GoodsItems.fromJSON(Map<String, dynamic> json) {
+    var itemsFromJson = json['items'] as List;
+    List<GoodsItem> itemsList = itemsFromJson.map((item) => GoodsItem.fromJSON(item)).toList();
+
+    return GoodsItems(
+      counts: json["counts"] ?? 0,
+      pageSize: json["pageSize"] ?? 0,
+      pages: json["pages"] ?? 0,
+      page: json["page"] ?? 1,
+      items: itemsList,
+    );
+  }
+}
+
+// 子类型（如：抢先尝鲜、新品预告）
+class SubType {
+  String id;
+  String title;
+  GoodsItems goodsItems;
+
+  SubType({
+    required this.id,
+    required this.title,
+    required this.goodsItems,
+  });
+
+  factory SubType.fromJSON(Map<String, dynamic> json) {
+    return SubType(
+      id: json["id"],
+      title: json["title"],
+      goodsItems: GoodsItems.fromJSON(json["goodsItems"]),
+    );
+  }
+}
+
+// 特惠推荐结果
+class SpecialRecommendResult {
+  String id;
+  String title;
+  List<SubType> subTypes;
+
+  SpecialRecommendResult({
+    required this.id,
+    required this.title,
+    required this.subTypes,
+  });
+
+  factory SpecialRecommendResult.fromJSON(Map<String, dynamic> json) {
+    var subTypesFromJson = json['subTypes'] as List;
+    List<SubType> subTypesList = subTypesFromJson.map((subType) => SubType.fromJSON(subType)).toList();
+
+    return SpecialRecommendResult(
+      id: json["id"],
+      title: json["title"],
+      subTypes: subTypesList,
+    );
+  }
+}

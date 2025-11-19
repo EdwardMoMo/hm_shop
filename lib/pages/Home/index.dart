@@ -16,6 +16,8 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
 
+  SpecialRecommendResult _specialRecommendResult = SpecialRecommendResult(id: "", title: "", subTypes: []);
+
   List<CategoryItem> _categoryList = [];
 
   List<BannerItem> _bannerList=[
@@ -39,7 +41,7 @@ class _HomeViewState extends State<HomeView> {
       SliverToBoxAdapter(child: SizedBox(height: 10)),
       SliverToBoxAdapter(child: HmCategory( categoryList: _categoryList)),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
-      SliverToBoxAdapter(child: HmSuggestion()),
+      SliverToBoxAdapter(child: HmSuggestion(specialRecommendResult: _specialRecommendResult)),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
       SliverToBoxAdapter(
         child: Padding(
@@ -47,9 +49,9 @@ class _HomeViewState extends State<HomeView> {
           child: Flex(
             direction: Axis.horizontal,
             children: [
-             Expanded(child: HmHot()), 
+             Expanded(child: HmHot(result: _inVogueResult, type: "hot")), 
              SizedBox(width: 10),
-             Expanded(child: HmHot())],
+             Expanded(child: HmHot(result: _oneStopResult, type: "step"))],
         ),
         ),
         ),
@@ -59,12 +61,44 @@ class _HomeViewState extends State<HomeView> {
     ];
   }
 
+  SpecialRecommendResult _inVogueResult = SpecialRecommendResult(
+    id: "",
+    title: "",
+    subTypes: []
+  );
+
+  SpecialRecommendResult _oneStopResult = SpecialRecommendResult(
+    id: "",
+    title: "",
+    subTypes: [],
+  );
+
+  void _getInVogueList() async {
+    _inVogueResult = await getInVogueListAPI();
+    setState(() {});
+  }
+
+  void _getOneStopList() async {
+    _oneStopResult = await getOneStopListAPI();
+    setState(() {});
+  }
+
+
   @override
   void initState(){
     super.initState();
     _getBannerList();
     _getCategoryList();
+    _getProductList();
+    _getInVogueList();
+    _getOneStopList();
   }
+
+  void _getProductList() async {
+    _specialRecommendResult = await getProductListAPI();
+    setState(() {});
+  }
+
 
   void _getBannerList() async {
     _bannerList = await getBannerListAPI();
