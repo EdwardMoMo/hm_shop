@@ -4,6 +4,7 @@ import "package:hm_shop/components/Home/HmCategory.dart"; // Add the correct imp
 import "package:hm_shop/components/Home/HmSuggestion.dart";
 import "package:hm_shop/components/Home/HmHot.dart";
 import "package:hm_shop/components/Home/HmMoreList.dart";
+import "package:hm_shop/utils/ToastUtils.dart";
 import "package:hm_shop/viewmodels/home.dart";
 import "package:hm_shop/api/home.dart";
 
@@ -15,12 +16,15 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-
-  SpecialRecommendResult _specialRecommendResult = SpecialRecommendResult(id: "", title: "", subTypes: []);
+  SpecialRecommendResult _specialRecommendResult = SpecialRecommendResult(
+    id: "",
+    title: "",
+    subTypes: [],
+  );
 
   List<CategoryItem> _categoryList = [];
 
-  List<BannerItem> _bannerList=[
+  List<BannerItem> _bannerList = [
     /* BannerItem(
       id: "1",
       imgUrl: "https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/meituan/1.jpg",
@@ -35,13 +39,15 @@ class _HomeViewState extends State<HomeView> {
     ), */
   ];
 
-  List<Widget> _getScrollChildren(){
+  List<Widget> _getScrollChildren() {
     return [
       SliverToBoxAdapter(child: HmSlider(bannerList: _bannerList)),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
-      SliverToBoxAdapter(child: HmCategory( categoryList: _categoryList)),
+      SliverToBoxAdapter(child: HmCategory(categoryList: _categoryList)),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
-      SliverToBoxAdapter(child: HmSuggestion(specialRecommendResult: _specialRecommendResult)),
+      SliverToBoxAdapter(
+        child: HmSuggestion(specialRecommendResult: _specialRecommendResult),
+      ),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
       SliverToBoxAdapter(
         child: Padding(
@@ -49,22 +55,26 @@ class _HomeViewState extends State<HomeView> {
           child: Flex(
             direction: Axis.horizontal,
             children: [
-             Expanded(child: HmHot(result: _inVogueResult, type: "hot")), 
-             SizedBox(width: 10),
-             Expanded(child: HmHot(result: _oneStopResult, type: "step"))],
+              Expanded(
+                child: HmHot(result: _inVogueResult, type: "hot"),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: HmHot(result: _oneStopResult, type: "step"),
+              ),
+            ],
+          ),
         ),
-        ),
-        ),
-        SliverToBoxAdapter(child: SizedBox(height: 10)),
-        HmMoreList(recommendList: _recommendList),
-
+      ),
+      SliverToBoxAdapter(child: SizedBox(height: 10)),
+      HmMoreList(recommendList: _recommendList),
     ];
   }
 
   SpecialRecommendResult _inVogueResult = SpecialRecommendResult(
     id: "",
     title: "",
-    subTypes: []
+    subTypes: [],
   );
 
   SpecialRecommendResult _oneStopResult = SpecialRecommendResult(
@@ -73,82 +83,117 @@ class _HomeViewState extends State<HomeView> {
     subTypes: [],
   );
 
-  List<GoodDetailItem> _recommendList=[];
+  List<GoodDetailItem> _recommendList = [];
 
   int _page = 1;
   bool _isLoading = false;
   bool _hasMore = true;
 
-  void _getRecommendList() async {
-     if(_isLoading || !_hasMore){
-      return;
-     }
-     _isLoading = true;
-     int requestLimit = _page * 8;
-    _recommendList = await getRecommendListAPI({"limit":requestLimit});
-    _isLoading = false;
-    setState(() {});
-
-    if(_recommendList.length < requestLimit){
-      _hasMore = false;
-      return;
-    }
-    
-    _page ++;
-    
-  }
-
-  void _getInVogueList() async {
-    _inVogueResult = await getInVogueListAPI();
-    setState(() {});
-  }
-
-  void _getOneStopList() async {
-    _oneStopResult = await getOneStopListAPI();
-    setState(() {});
-  }
-
-
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    _getBannerList();
+    /* _getBannerList();
     _getCategoryList();
     _getProductList();
     _getInVogueList();
     _getOneStopList();
-    _getRecommendList();
+    _getRecommendList(); */
     _registerEvent();
+    Future.microtask((){
+      _paddingTop = 100;
+      setState((){});
+      _refreshIndicatorKey.currentState?.show();
+    });
   }
 
-  void _registerEvent(){
-      _controller.addListener((){
-        if (_controller.position.pixels >= (_controller.position.maxScrollExtent - 50)) {
-          _getRecommendList();
-        }
-      });
+    void _registerEvent() {
+    _controller.addListener(() {
+      if (_controller.position.pixels >=
+          (_controller.position.maxScrollExtent - 50)) {
+        _getRecommendList();
+      }
+    });
   }
 
-  void _getProductList() async {
+  Future<void> _getRecommendList() async {
+    if (_isLoading || !_hasMore) {
+      return;
+    }
+    _isLoading = true;
+    int requestLimit = _page * 8;
+    _recommendList = await getRecommendListAPI({"limit": requestLimit});
+    _isLoading = false;
+    setState(() {});
+
+    if (_recommendList.length < requestLimit) {
+      _hasMore = false;
+      return;
+    }
+
+    _page++;
+  }
+
+  Future<void> _getInVogueList() async {
+    _inVogueResult = await getInVogueListAPI();
+    setState(() {});
+  }
+
+  Future<void> _getOneStopList() async {
+    _oneStopResult = await getOneStopListAPI();
+    setState(() {});
+  }
+
+  Future<void> _getProductList() async {
     _specialRecommendResult = await getProductListAPI();
     setState(() {});
   }
 
-
-  void _getBannerList() async {
+  Future<void> _getBannerList() async {
     _bannerList = await getBannerListAPI();
     setState(() {});
   }
 
-  void _getCategoryList() async {
+  Future<void> _getCategoryList() async {
     _categoryList = await getCategoryListAPI();
     setState(() {});
   }
 
+  Future<void> _onRefresh() async {
+    _page =1;
+    _isLoading = false; 
+    _hasMore = true;
+
+    await _getBannerList();
+    await _getCategoryList();
+    await _getProductList();
+    await _getInVogueList();
+    await _getOneStopList();
+    await _getRecommendList();
+
+    ToastUtils.showToast(context, "刷新成功喽");
+    _paddingTop = 0;
+    setState((){});
+  }
+  
   final ScrollController _controller = ScrollController();
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+
+  double _paddingTop = 0;
+
   @override
-  Widget build(BuildContext context) {    
-    return CustomScrollView(
-      controller: _controller,slivers: _getScrollChildren());
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      key: _refreshIndicatorKey,
+      onRefresh: _onRefresh,
+      child: AnimatedContainer(
+        padding: EdgeInsets.only(top: _paddingTop),
+        duration: Duration(milliseconds: 300),
+        child: CustomScrollView(
+        controller: _controller,
+        slivers: _getScrollChildren(),
+      ),
+      ),      
+    );
   }
 }
